@@ -4,6 +4,10 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
+// mongodb
+var monk = require('monk');
+var db = monk('localhost:27017/nodetest1');
+
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -22,6 +26,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // these lines are important..
+// ..make the db accessible to the router
+app.use(function(req, res, next){     // this bit must be placed BEFORE the routing portions
+  req.db = db;  // add the db object to all HTTP requests the app makes
+  next();
+});
 app.use('/', indexRouter);      // requests to localhost:3000/ should use the INDEX ROUTER
 app.use('/users', usersRouter); // requests to localhost:3000/users should use the USERS ROUTER
 
